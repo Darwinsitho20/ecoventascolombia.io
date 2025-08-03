@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>EcoVenta Colombia - Productos Naturales</title>
+  <meta name="description" content="Tienda de productos naturistas colombianos: café, cacao, panela, frutas, miel y más.">
+  <style>
+    :root {
+      --bg:#f5f3ef;
+      --card:#ffffff;
+      --radius:16px;
+      --shadow:0 12px 40px -10px rgba(0,0,0,0.1);
+      --green:#4f7942;
+      --muted:#7a7a7a;
+      --transition:.35s cubic-bezier(.3,.1,.2,1);
+      font-family: system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+    }
+    *{box-sizing:border-box;}
+    body {
+      margin:0;
+      background: var(--bg);
+      color:#222;
+      min-height:100vh;
+      line-height:1.4;
+    }
+    header {
+      padding:1rem 1.25rem;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      flex-wrap:wrap;
+      gap:.5rem;
+      position:sticky;
+      top:0;
+      background:rgba(255,255,255,0.95);
+      backdrop-filter:blur(6px);
+      border-bottom:1px solid #e3e1dd;
+      z-index:10;
+    }
+    .logo {
+      font-weight:700;
+      font-size:1.25rem;
+      display:flex;
+      align-items:center;
+      gap:.4rem;
+    }
+    .logo span {
+      background: var(--green);
+      color:#fff;
+      padding:5px 10px;
+      border-radius:8px;
+      font-size:.9rem;
+      margin-right:6px;
+    }
+    nav {
+      display:flex;
+      gap:1rem;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+    .btn {
+      cursor:pointer;
+      border:none;
+      padding:.65rem 1rem;
+      border-radius:999px;
+      font-size:.9rem;
+      font-weight:600;
+      display:inline-flex;
+      align-items:center;
+      gap:.3rem;
+      transition: var(--transition);
+      background: var(--green);
+      color:#fff;
+    }
+    .btn:hover {filter:brightness(1.08);}
+    .search {
+      position:relative;
+      flex:1;
+      min-width:180px;
+    }
+    .search input {
+      width:100%;
+      padding:.6rem 1rem .6rem 2.5rem;
+      border-radius:999px;
+      border:1px solid #d8d6d1;
+      font-size:.9rem;
+    }
+    .search svg {
+      position:absolute;
+      left:10px;
+      top:50%;
+      transform:translateY(-50%);
+      width:16px;
+      height:16px;
+      stroke: #888;
+    }
+    main {
+      padding:1rem 1.25rem 3rem;
+      max-width:1200px;
+      margin:0 auto;
+    }
+    .grid {
+      display:grid;
+      gap:1.25rem;
+      grid-template-columns: repeat(auto-fit,minmax(250px,1fr));
+    }
+    .card {
+      background: var(--card);
+      border-radius: var(--radius);
+      padding:1rem;
+      position:relative;
+      display:flex;
+      flex-direction:column;
+      gap:.75rem;
+      box-shadow: var(--shadow);
+      transition: var(--transition);
+    }
+    .card:hover {transform:translateY(-3px);}
+    .product-img {
+      width:100%;
+      aspect-ratio:1.1;
+      background-size:cover;
+      background-position:center;
+      border-radius:12px;
+    }
+    .tag {
+      font-size:.6rem;
+      background:#e6f2e8;
+      color:#336645;
+      padding:4px 10px;
+      border-radius:999px;
+      display:inline-block;
+      margin-bottom:4px;
+      font-weight:600;
+    }
+    .title {
+      font-size:1.1rem;
+      font-weight:600;
+      margin:0;
+    }
+    .desc {
+      font-size:.85rem;
+      color: #555;
+      flex:1;
+    }
+    .price {
+      font-weight:700;
+      font-size:1rem;
+      margin:0;
+      display:inline-block;
+    }
+    .actions {
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:.5rem;
+      flex-wrap:wrap;
+    }
+    .small {
+      font-size:.75rem;
+      color: var(--muted);
+    }
+    .badge {
+      position:absolute;
+      top:12px;
+      right:12px;
+      background: #ffe7d6;
+      color:#b45f00;
+      padding:6px 10px;
+      border-radius:999px;
+      font-size:.6rem;
+      font-weight:600;
+    }
+    /* Carrito float */
+    .cart-preview {
+      position:fixed;
+      bottom:16px;
+      right:16px;
+      width:320px;
+      max-width:90%;
+      background: #fff;
+      border-radius:16px;
+      box-shadow:0 30px 60px -10px rgba(0,0,0,0.15);
+      overflow:hidden;
+      display:flex;
+      flex-direction:column;
+      font-size:.9rem;
+      z-index:50;
+      transition:var(--transition);
+    }
+    .cart-header {
+      padding:12px 16px;
+      background: var(--green);
+      color:#fff;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+    }
+    .cart-body {
+      max-height:320px;
+      overflow:auto;
+      padding:12px 16px;
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+    }
+    .cart-item {
+      display:flex;
+      gap:10px;
+      align-items:center;
+      border-bottom:1px solid #eee;
+      padding-bottom:8px;
+    }
+    .cart-item img {
+      width:50px;
+      height:50px;
+      border-radius:8px;
+      object-fit:cover;
+    }
+    .item-info {
+      flex:1;
+      display:flex;
+      flex-direction:column;
+      gap:4px;
+    }
+    .qty-control {
+      display:flex;
+      align-items:center;
+      gap:4px;
+      font-size:.75rem;
+    }
+    .qty-control button {
+      background: #e1e1e1;
+      border:none;
+      padding:2px 6px;
+      border-radius:6px;
+      cursor:pointer;
+    }
+    .checkout {
+      padding:12px 16px;
+      border-top:1px solid #eee;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:.5rem;
+    }
+    .total {
+      font-weight:700;
+      font-size:1.05rem;
+    }
+    .pill {
+      background:#f0f7f2;
+      padding:6px 12px;
+      border-radius:999px;
+      font-size:.6rem;
+      display:inline-block;
+      margin-right:6px;
+    }
+    /* filtros */
+    .filters {
+      display:flex;
+      gap:1rem;
+      flex-wrap:wrap;
+      margin-bottom:1rem;
+    }
+    .filter-card {
+      background:#fff;
+      padding:10px 14px;
+      border-radius:12px;
+      box-shadow:0 16px 32px -8px rgba(0,0,0,0.06);
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+    .tag-toggle {
+      padding:6px 14px;
+      border:1px solid #cfd0ce;
+      border-radius:999px;
+      cursor:pointer;
+      font-size:.75rem;
+      background:#f9f9f7;
+      transition:var(--transition);
+    }
+    .tag-toggle.active {
+      background: var(--green);
+      color:#fff;
+      border-color: var(--green);
+    }
+    .badge-cart-count {
+      background:#ffb74d;
+      color:#3e2f00;
+      padding:4px 8px;
+      border-radius:999px;
+      font-size:.65rem;
+      margin-left:4px;
+    }
+    /* Modal detalle */
+    .overlay {
+      position:fixed;
+      inset:0;
+      background:rgba(0,0,0,0.35);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding:16px;
+      z-index:100;
+    }
+    .modal {
+      background:#fff;
+      border-radius:16px;
+      width:100%;
+      max-width:600px;
+      padding:20px 24px;
+      position:relative;
+      box-shadow:0 50px 90px -20px rgba(0,0,0,0.2);
+    }
+    .close-btn {
+      position:absolute;
+      top:12px;
+      right:12px;
+      background:none;
+      border:none;
+      cursor:pointer;
+      font-size:18px;
+      padding:6px;
+      line-height:1;
+    }
+    .product-detail {
+      display:flex;
+      gap:20px;
+      flex-wrap:wrap;
+    }
+    .product-detail .left {
+      flex:1 1 220px;
+      min-width:200px;
+    }
+    .product-detail .right {
+      flex:1 1 260px;
+      min-width:200px;
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    }
+    .badge-new {
+      background:#d4f8e8;
+      color:#1e6f45;
+    }
+    footer {
+      margin-top:60px;
+      padding:30px 16px;
+      text-align:center;
+      font-size:.75rem;
+      color:#666;
+    }
+    @media (max-width:900px){
+      .cart-preview {right:8px; left:auto; width:auto; min-width:280px;}
+      .product-detail {flex-direction:column;}
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">
+      <span>🌿</span>
+      <div>
+        <div>EcoVenta Colombia</div>
+        <div style="font-size:.55rem; color:#555;">Naturaleza en tu carrito</div>
+      </div>
+    </div>
+    <div style="flex:1; min-width:220px;">
+      <div class="search">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+          <circle cx="11" cy="11" r="7" stroke="currentColor" fill="none"/>
+          <path d="M16 16l4 4" stroke="currentColor" stroke-linecap="round"/>
+        </svg>
+        <input id="searchInput" placeholder="Buscar producto..." aria-label="Buscar productos"/>
+      </div>
+    </div>
+    <nav>
+      <div class="filters" aria-label="Filtros rápidos">
+        <div class="filter-card">
+          <div class="small">Categorías:</div>
+          <div class="tag-toggle active" data-filter="all">Todas</div>
+          <div class="tag-toggle" data-filter="cafe">Café</div>
+          <div class="tag-toggle" data-filter="panela">Panela</div>
+          <div class="tag-toggle" data-filter="infusion">Infusiones</div>
+          <div class="tag-toggle" data-filter="fruta">Fruta</div>
+          <div class="tag-toggle" data-filter="chocolate">Chocolate</div>
+          <div class="tag-toggle" data-filter="otros">Otros</div>
+        </div>
+      </div>
+      <button class="btn" id="view-cart-btn" aria-label="Ver carrito">
+        🛒 Carrito <span class="badge-cart-count" id="cart-count">0</span>
+      </button>
+    </nav>
+  </header>
+
+  <main>
+    <section aria-label="Productos disponibles">
+      <div style="margin-bottom:8px;">
+        <h2 style="margin:0; font-size:1.5rem;">Productos Naturales Colombianos</h2>
+        <p style="margin:4px 0 12px;">Selecciona, filtra y agrega al carrito. Envíos a todo el país.</p>
+      </div>
+      <div class="grid" id="products-container">
+        <!-- Productos se insertan desde JS -->
+      </div>
+      <div style="margin-top:40px; display:flex; gap:16px; flex-wrap:wrap;">
+        <div style="flex:1; min-width:200px; background:#fff; padding:16px; border-radius:12px; box-shadow:0 14px 36px -8px rgba(0,0,0,0.06);">
+          <h3 style="margin-top:0;">¿Por qué elegir natural?</h3>
+          <p style="margin:0;">Nuestros productos provienen de pequeños productores colombianos. Sin aditivos, sin químicos, con sabor auténtico y sostenibilidad.</p>
+        </div>
+        <div style="flex:1; min-width:200px; background:#fff; padding:16px; border-radius:12px; box-shadow:0 14px 36px -8px rgba(0,0,0,0.06);">
+          <h3 style="margin-top:0;">Compra segura</h3>
+          <p style="margin:0;">Sistema simple de carrito: agrega, ajusta cantidades y confirma. Pensado para usar en celular o escritorio.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Carrito flotante -->
+  <div class="cart-preview" id="cartPreview" aria-label="Vista del carrito" style="display:none;">
+    <div class="cart-header">
+      <div>Tu carrito</div>
+      <div>
+        <button style="background:rgba(255,255,255,0.3); border:none; border-radius:50%; padding:6px; cursor:pointer;" id="closeCart" aria-label="Cerrar carrito">&times;</button>
+      </div>
+    </div>
+    <div class="cart-body" id="cartItems">
+      <!-- items -->
+    </div>
+    <div class="checkout">
+      <div class="total">Total: <span id="totalAmount">$0</span></div>
+      <button class="btn" id="checkoutBtn">Pagar</button>
+    </div>
+  </div>
+
+  <!-- Modal detalle producto -->
+  <div class="overlay" id="detailOverlay" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-label="Detalle del producto">
+      <button class="close-btn" aria-label="Cerrar detalle" id="closeDetail">&times;</button>
+      <div class="product-detail">
+        <div class="left">
+          <div class="product-img" id="detailImage" style="background-image:url('');"></div>
+        </div>
+        <div class="right">
+          <div class="tag" id="detailCategory">Categoría</div>
+          <h2 class="title" id="detailTitle">Nombre del producto</h2>
+          <div class="small" id="detailDesc">Descripción breve del producto que resalta su origen y beneficios.</div>
+          <div style="margin:8px 0;">
+            <div class="price" id="detailPrice">$0</div>
+            <div class="small">Precio por unidad</div>
+          </div>
+          <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+            <div class="qty-control" aria-label="Control de cantidad">
+              <button data-action="decrease" aria-label="Disminuir cantidad">-</button>
+              <div id="detailQty" style="min-width:24px; text-align:center;">1</div>
+              <button data-action="increase" aria-label="Aumentar cantidad">+</button>
+            </div>
+            <button class="btn" id="addDetailCart">Agregar al carrito</button>
+          </div>
+          <div class="small" style="margin-top:4px;">Envíos rápidos dentro de Colombia.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <div>© 2025 EcoVenta Colombia. Todos los derechos reservados. Hecho con enfoque natural y simple.</div>
+    <div style="margin-top:6px;">Diseño responsive, pensado para celulares y computadoras.</div>
+  </footer>
+
+  <script>
+    // Datos ampliados de productos colombianos
+    const products = [
+      {
+        id: 'p1',
+        name: 'Café Orgánico de Sierra Nevada',
+        category: 'cafe',
+        price: 22000,
+        description: 'Café de cultivo sostenible, tueste medio, aroma frutal.',
+        image: 'https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=400&h=400&q=80',
+        tags: ['Nuevo'],
+        stock: 50
+      },
+      {
+        id: 'p5',
+        name: 'Café Tostado de Altura',
+        category: 'cafe',
+        price: 25000,
+        description: 'Tueste oscuro, sabor intenso, ideal para espresso.',
+        image: 'https://images.unsplash.com/photo-1511920170033-f8396924c348?auto=format&fit=crop&w=400&h=400&q=80',
+        tags: [],
+        stock: 30
+      },
+      {
+        id: 'p2',
+        name: 'Panela en bloque',
+        category: 'panela',
+        price: 8000,
+        description: 'Panela artesanal de caña, sin refinamiento, fuente natural de energía.',
+        image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQQhJXMd0DveDgrLv4EqkIMTmp0Y5UnkBnx_Q&s',
+        tags: [],
+        stock: 120
+      },
+      {
+        id: 'p6',
+        name: 'Arequipe Natural',
+        category: 'otros',
+        price: 14000,
+        description: 'Dulce tradicional cremoso, hecho con leche y panela, sin preservantes.',
+        image: 'https://colombia.co/sites/default/files/marca-pais/media/images/Manjar-Blanco-dulce-tradicional-de-Colombia.webp',
+        tags: [],
+        stock: 70
+      },
+      {
+        id: 'p3',
+        name: 'Infusión de Hierbas Andinas',
+        category: 'infusion',
+        price: 15000,
+        description: 'Mezcla de menta, romero y flores para relajar y ayudar a la digestión.',
+        image: 'https://portal.andina.pe/EDPfotografia3/Thumbnail/2021/06/03/000779166W.jpg',
+        tags: ['Recomendado'],
+        stock: 80
+      },
+      {
+        id: 'p4',
+        name: 'Miel de Bosque Natural',
+        category: 'infusion',
+        price: 18000,
+        description: 'Miel cruda, sin pasteurizar, de flores silvestres.',
+        image: 'https://images.unsplash.com/photo-1502741338009-cac2772e18bc?auto=format&fit=crop&w=400&h=400&q=80',
+        tags: [],
+        stock: 60
+      },
+      {
+        id: 'p7',
+        name: 'Cacao Puro en Polvo',
+        category: 'chocolate',
+        price: 20000,
+        description: 'Cacao 100% colombiano, sin azúcar, para recetas y bebidas saludables.',
+        image: 'https://s2.abcstatics.com/media/bienestar/2020/02/23/cacao-puro-U303042264459IQE--1248x698@abc.jpg',
+        tags: [],
+        stock: 90
+      },
+      {
+        id: 'p8',
+        name: 'Chocolate Amargo Artesanal',
+        category: 'chocolate',
+        price: 28000,
+        description: 'Chocolate oscuro con cacao de origen colombiano, con trozos de nibs.',
+        image: 'https://kakaowa.co/wp-content/uploads/2021/11/barra-de-chocolate-70web.webp',
+        tags: ['Premium'],
+        stock: 40
+      },
+      {
+        id: 'p9',
+        name: 'Mango Deshidratado',
+        category: 'fruta',
+        price: 12000,
+        description: 'Mango tropical deshidratado sin azúcar añadida, snack natural.',
+        image: 'https://cloudinary.images-iherb.com/image/upload/f_auto,q_auto:eco/images/gds/gds86262/y/5.jpg',
+        tags: [],
+        stock: 100
+      },
+      {
+        id: 'p10',
+        name: 'Guayaba Natural',
+        category: 'fruta',
+        price: 10000,
+        description: 'Guayaba fresca en trozos deshidratados, rica en vitamina C.',
+        image: 'https://nectarfruit.es/wp-content/uploads/2020/06/shutterstock_1278486652.jpg',
+        tags: [],
+        stock: 85
+      },
+      {
+        id: 'p11',
+        name: 'Aceite de Coco Virgen',
+        category: 'otros',
+        price: 32000,
+        description: 'Aceite de coco prensado en frío, para piel, cabello y cocina saludable.',
+        image: 'https://exitocol.vtexassets.com/arquivos/ids/26674537/Aceite-de-Coco-Extravirgen-MONTERRA-400-ml-3081132_a.jpg?v=638740025197230000',
+        tags: [],
+        stock: 55
+      },
+      {
+        id: 'p12',
+        name: 'Chontaduro Fresco',
+        category: 'fruta',
+        price: 18000,
+        description: 'Fruta energética típica de la costa, rica en fibra y vitaminas.',
+        image: 'https://listoyfresco.com/wp-content/uploads/listo-y-fresco-producto-chontaduro-palm-fruit.png',
+        tags: [],
+        stock: 70
+      },
+      {
+        id: 'p13',
+        name: 'Cacao en Tableta con Nibs',
+        category: 'chocolate',
+        price: 30000,
+        description: 'Tableta de cacao con trozos crujientes de nibs, sabor intenso colombiano.',
+        image: 'https://www.arflina.com/ProductoImagen/gp554/975.jpg',
+        tags: ['Edición limitada'],
+        stock: 25
+      }
+    ];
+
+    let cart = {};
+
+    // Utilidades
+    const formatMoney = n => {
+      return '$' + n.toLocaleString('es-CO');
+    };
+
+    // Render productos filtrados
+    function renderProducts(filter = 'all', search = '') {
+      const container = document.getElementById('products-container');
+      container.innerHTML = '';
+      const term = search.trim().toLowerCase();
+      const filtered = products.filter(p => {
+        const matchCategory = filter === 'all' || (filter === 'otros' ? ['otros'].includes(p.category) : p.category === filter);
+        const matchSearch = term === '' || p.name.toLowerCase().includes(term) || p.description.toLowerCase().includes(term);
+        return matchCategory && matchSearch;
+      });
+      if (filtered.length === 0) {
+        container.innerHTML = '<div style="grid-column:1/-1; padding:40px; background:#fff; border-radius:12px; text-align:center; box-shadow:0 14px 36px -8px rgba(0,0,0,0.04);">No se encontraron productos que coincidan.</div>';
+        return;
+      }
+      filtered.forEach(p => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = `
+          ${p.tags.length ? `<div class="badge">${p.tags[0]}</div>` : ''}
+          <div class="product-img" style="background-image:url('${p.image}');" aria-label="Imagen de ${p.name}"></div>
+          <div style="display:flex; flex-direction:column; gap:6px;">
+            <div class="tag">${capitalize(p.category)}</div>
+            <h3 class="title">${p.name}</h3>
+            <div class="desc">${p.description}</div>
+            <div class="actions">
+              <div>
+                <div class="price">${formatMoney(p.price)}</div>
+                <div class="small">por unidad</div>
+              </div>
+              <div style="margin-left:auto; display:flex; gap:8px; flex-wrap:wrap;">
+                <button class="btn" data-action="view" data-id="${p.id}" aria-label="Ver detalles de ${p.name}">Ver</button>
+                <button class="btn" data-action="add" data-id="${p.id}" aria-label="Agregar ${p.name} al carrito">+ Carrito</button>
+              </div>
+            </div>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function capitalize(s){ return s.charAt(0).toUpperCase()+s.slice(1); }
+
+    // Cart logic
+    function updateCartCount() {
+      const countEl = document.getElementById('cart-count');
+      const totalItems = Object.values(cart).reduce((sum,i)=>sum + i.qty,0);
+      countEl.textContent = totalItems;
+      document.querySelectorAll('.badge-cart-count').forEach(b=> {
+        b.style.display = totalItems? 'inline-block':'none';
+      });
+    }
+
+    function openCart() {
+      const panel = document.getElementById('cartPreview');
+      panel.style.display = 'flex';
+      refreshCartUI();
+    }
+    function closeCart() {
+      document.getElementById('cartPreview').style.display = 'none';
+    }
+
+    function refreshCartUI() {
+      const container = document.getElementById('cartItems');
+      container.innerHTML = '';
+      let total = 0;
+      if (Object.keys(cart).length === 0) {
+        container.innerHTML = '<div style="padding:20px; text-align:center; color:#555;">Tu carrito está vacío.</div>';
+      } else {
+        Object.values(cart).forEach(item => {
+          const prod = products.find(p=>p.id===item.id);
+          if (!prod) return;
+          const row = document.createElement('div');
+          row.className = 'cart-item';
+          row.innerHTML = `
+            <img src="${prod.image}" alt="${prod.name}" />
+            <div class="item-info">
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <div><strong>${prod.name}</strong></div>
+                <div>${formatMoney(prod.price * item.qty)}</div>
+              </div>
+              <div class="qty-control">
+                <button data-action="dec" data-id="${item.id}" aria-label="Disminuir cantidad">-</button>
+                <div style="margin:0 6px;">${item.qty}</div>
+                <button data-action="inc" data-id="${item.id}" aria-label="Aumentar cantidad">+</button>
+                <div class="small" style="margin-left:auto;">${formatMoney(prod.price)} c/u</div>
+              </div>
+            </div>
+          `;
+          container.appendChild(row);
+          total += prod.price * item.qty;
+        });
+      }
+      document.getElementById('totalAmount').textContent = formatMoney(total);
+      updateCartCount();
+    }
+
+    function addToCart(id, qty=1) {
+      if (!cart[id]) cart[id] = { id, qty:0 };
+      cart[id].qty += qty;
+      if (cart[id].qty < 1) delete cart[id];
+      refreshCartUI();
+    }
+
+    function changeQty(id, delta) {
+      if (!cart[id]) return;
+      cart[id].qty += delta;
+      if (cart[id].qty < 1) delete cart[id];
+      refreshCartUI();
+    }
+
+    // Detalle modal
+    let currentDetail = null;
+    function showDetail(id) {
+      const prod = products.find(p=>p.id===id);
+      if (!prod) return;
+      currentDetail = { ...prod };
+      document.getElementById('detailImage').style.backgroundImage = `url('${prod.image}')`;
+      document.getElementById('detailCategory').textContent = capitalize(prod.category);
+      document.getElementById('detailTitle').textContent = prod.name;
+      document.getElementById('detailDesc').textContent = prod.description;
+      document.getElementById('detailPrice').textContent = formatMoney(prod.price);
+      document.getElementById('detailQty').textContent = '1';
+      document.getElementById('detailOverlay').style.display = 'flex';
+      document.getElementById('detailOverlay').setAttribute('aria-hidden','false');
+    }
+    function closeDetailModal() {
+      document.getElementById('detailOverlay').style.display = 'none';
+      document.getElementById('detailOverlay').setAttribute('aria-hidden','true');
+    }
+
+    // Eventos globales
+    document.addEventListener('click', e => {
+      const action = e.target.closest('[data-action]');
+      if (action) {
+        const act = action.getAttribute('data-action');
+        const id = action.getAttribute('data-id');
+        if (act === 'add') {
+          addToCart(id,1);
+          openCart();
+        }
+        if (act === 'view') {
+          showDetail(id);
+        }
+        if (act === 'inc') changeQty(id,1);
+        if (act === 'dec') changeQty(id,-1);
+      }
+    });
+
+    document.getElementById('view-cart-btn').addEventListener('click', openCart);
+    document.getElementById('closeCart').addEventListener('click', closeCart);
+    document.getElementById('checkoutBtn').addEventListener('click', ()=> {
+      if (Object.keys(cart).length === 0) {
+        alert('El carrito está vacío.');
+        return;
+      }
+      const total = Object.values(cart).reduce((sum,i)=>{
+        const p = products.find(p=>p.id===i.id);
+        return sum + (p ? p.price * i.qty : 0);
+      },0);
+      alert('Gracias por tu compra. Total: ' + formatMoney(total) + '\n(Implementa aquí integración de pagos)'); 
+      cart = {};
+      refreshCartUI();
+      closeCart();
+    });
+
+    // Filtros
+    document.querySelectorAll('.tag-toggle').forEach(el => {
+      el.addEventListener('click', () => {
+        document.querySelectorAll('.tag-toggle').forEach(x=>x.classList.remove('active'));
+        el.classList.add('active');
+        const filter = el.getAttribute('data-filter');
+        const term = document.getElementById('searchInput').value;
+        renderProducts(filter, term);
+      });
+    });
+
+    // Buscador en tiempo real
+    document.getElementById('searchInput').addEventListener('input', (e) => {
+      const term = e.target.value;
+      const active = document.querySelector('.tag-toggle.active');
+      const filter = active ? active.getAttribute('data-filter') : 'all';
+      renderProducts(filter, term);
+    });
+
+    // Detalle cantidad control
+    document.getElementById('addDetailCart').addEventListener('click', () => {
+      if (!currentDetail) return;
+      const q = parseInt(document.getElementById('detailQty').textContent) || 1;
+      addToCart(currentDetail.id, q);
+      closeDetailModal();
+      openCart();
+    });
+    document.getElementById('detailOverlay').addEventListener('click', (e) => {
+      if (e.target === document.getElementById('detailOverlay')) closeDetailModal();
+    });
+    document.getElementById('closeDetail').addEventListener('click', closeDetailModal);
+    document.querySelectorAll('[data-action="increase"], [data-action="decrease"]').forEach(btn => {
+      btn.addEventListener('click', e => {
+        const action = e.currentTarget.getAttribute('data-action');
+        const qtyEl = document.getElementById('detailQty');
+        let v = parseInt(qtyEl.textContent) || 1;
+        if (action === 'increase') v++;
+        if (action === 'decrease' && v>1) v--;
+        qtyEl.textContent = v;
+      });
+    });
+
+    // Inicialización
+    renderProducts();
+    refreshCartUI();
+  </script>
+</body>
+</html>
